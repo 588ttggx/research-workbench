@@ -1,5 +1,7 @@
 # Research Workbench · 科研工作台
 
+源码已公开。Windows 安装器已生成，并完成本机隔离安装验证；Release 附件发布尚未完成，目前没有公开的安装器下载。发布完成后可从 [Releases](https://github.com/588ttggx/research-workbench/releases) 获取。
+
 在本机管理科研项目、知识笔记和文献，并按需连接 DeepSeek、Zotero 与本地检索。
 
 ## 安装
