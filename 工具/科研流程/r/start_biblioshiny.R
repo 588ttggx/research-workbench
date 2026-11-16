@@ -1,0 +1,5 @@
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) != 1) stop("Provide R library directory")
+.libPaths(c(args[1], .libPaths()))
+suppressPackageStartupMessages(library(bibliometrix))
+biblioshiny(host = "127.0.0.1", port = 8506, launch.browser = FALSE)

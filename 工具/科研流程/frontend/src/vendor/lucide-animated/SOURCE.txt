@@ -1,0 +1,5 @@
+Lucide Animated by pqoqubbw
+MIT License
+https://github.com/pqoqubbw/icons
+Commit: 4662fff2b60fdcf4751b32013606756caf7c4c26
+Only the cn import is adapted to the local class-name helper. Original geometry and animations retained.

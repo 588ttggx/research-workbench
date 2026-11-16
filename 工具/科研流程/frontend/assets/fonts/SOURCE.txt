@@ -1,0 +1,5 @@
+Noto Sans SC Regular, unmodified upstream OpenType font.
+Source: https://github.com/notofonts/noto-cjk/blob/main/Sans/SubsetOTF/SC/NotoSansSC-Regular.otf
+Retrieved 2026-10-29 from the official noto-cjk repository.
+License: SIL Open Font License 1.1; see OFL.txt in this directory.
+This application serves the font locally and does not install it on the system.

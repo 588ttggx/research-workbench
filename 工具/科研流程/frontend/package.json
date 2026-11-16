@@ -1,0 +1,31 @@
+{
+  "name": "research-project-canvas",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "build:knowledge": "node knowledge-build.mjs",
+    "test:knowledge-3d": "node --test src/knowledge-3d.test.mjs"
+  },
+  "dependencies": {
+    "@xyflow/react": "12.12.0",
+    "camera-controls": "3.1.2",
+    "d3-contour": "4.0.2",
+    "d3-force-3d": "3.0.6",
+    "d3-geo": "3.1.1",
+    "elkjs": "0.12.0",
+    "embedding-atlas": "0.26.0",
+    "idb-keyval": "6.3.0",
+    "lucide-react": "1.60.0",
+    "motion": "14.7.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "three": "0.186.1",
+    "troika-three-text": "0.52.5",
+    "troika-worker-utils": "0.52.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

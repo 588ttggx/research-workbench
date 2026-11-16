@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "open_notebook": {
+    "version": "1.15.0",
+    "runtime": "工具/OpenNotebook/open-notebook-1.15.0",
+    "data": "工具/OpenNotebook/data"
+  },
+  "integration": {
+    "schema": 2,
+    "entry": "工具/科研流程/dashboard.py",
+    "data": "工具/科研流程/数据"
+  },
+  "n8n": {
+    "version": "2.42.4",
+    "runtime": "工具/n8n/runtime-2.42.4",
+    "data": "工具/n8n/data",
+    "installed": false
+  },
+  "document_parser": {
+    "enabled": false,
+    "version": "PaddleOCR-VL-1.6",
+    "runtime": "runtime/PaddleOCR-VL",
+    "cache": "runtime/cache/document-parser",
+    "inference_runtime": "WSL Ubuntu-24.04:/opt/thz-document-vlm"
+  },
+  "graphviz": {
+    "version": "16.1.0",
+    "executable": "工具/Graphviz/16.1.0/Graphviz-16.1.0-win64/bin/dot.exe"
+  },
+  "r": {
+    "version": "4.6.1",
+    "runtime": "工具/R/4.6.1"
+  },
+  "powershell": {
+    "version": "7.6.9",
+    "runtime": "工具/PowerShell/7.6.9",
+    "executable": "工具/PowerShell/7.6.9/pwsh.exe"
+  }
+}

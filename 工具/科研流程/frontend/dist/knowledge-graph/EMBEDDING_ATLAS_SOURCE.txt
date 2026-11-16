@@ -1,0 +1,4 @@
+embedding-atlas@0.26.0
+MIT
+https://raw.githubusercontent.com/apple/embedding-atlas/v0.26.0/LICENSE
+Algorithms only: CPU/Wasm UMAPFromKNN; rendering stays in the existing graph modules.

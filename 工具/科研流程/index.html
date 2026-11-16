@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>研序 · 科研工作区</title>
+<link rel="stylesheet" href="/vendor/editor.css"><link rel="stylesheet" href="/workspace.css"><link rel="stylesheet" href="/workspace-knowledge-graph.css"><link rel="stylesheet" href="/workspace-knowledge-detail.css">
+<script defer src="/vendor/marked.js"></script><script defer src="/vendor/purify.js"></script><script defer src="/vendor/editor.js"></script><script defer src="/vendor/editor-zh.js"></script>
+<script defer src="/vendor/cytoscape.js"></script><script defer src="/vendor/layout-base.js"></script><script defer src="/vendor/cose-base.js"></script><script defer src="/vendor/fcose.js"></script><script defer src="/vendor/knowledge-graph/icons.js"></script><script defer src="/workspace-graph.js"></script><script defer src="/vendor/knowledge-graph/knowledge-cache.js"></script><script defer src="/knowledge-scene.js"></script><script defer src="/workspace-knowledge-graph.js"></script><script defer src="/workspace-catalog.js"></script><script defer src="/workspace-data.js"></script><script defer src="/workspace-scholarly.js"></script><script defer src="/workspace-provenance.js"></script><script defer src="/workspace-documents.js"></script><script defer src="/workspace-change-impacts.js"></script><script defer src="/workspace-review.js"></script><script defer src="/workspace-connectors.js"></script><script defer src="/workspace-methods.js"></script><script defer src="/workspace-review-queue.js"></script><script defer src="/workspace-navigation.js"></script><script defer src="/workspace-questions.js"></script><script defer src="/workspace-canvas.js"></script><script defer src="/workspace-projects.js"></script><script defer src="/workspace-skills.js"></script><script defer src="/workspace-loading.js"></script><script defer src="/workspace-knowledge-detail.js"></script><script defer src="/workspace-app.js"></script>
+</head><body>
+<a class="skip-link" href="#view">跳到当前内容</a>
+<aside class="sidebar" aria-label="工作区导航">
+<div class="brand"><span class="brand-mark" aria-hidden="true">研</span><div><strong>研序</strong><span>RESEARCH WORKSPACE</span></div></div>
+<label class="project-picker">当前项目<select id="projectContext" aria-label="当前项目" disabled><option value="">正在读取项目</option></select></label>
+<button id="projectManage" class="project-manage-button">管理与新建项目</button>
+<div class="nav-label">工作区</div>
+<nav id="primaryNav" aria-label="六个工作区">
+<button data-route="discover"><span data-icon="radar"></span><span>发现</span><small>Discover</small></button>
+<button data-route="knowledge"><span data-icon="book"></span><span>知识</span><small>Knowledge</small></button>
+<button data-route="projects"><span data-icon="layers"></span><span>项目</span><small>Projects</small></button>
+<button data-route="lab"><span data-icon="flask"></span><span>实验</span><small>Lab</small></button>
+<button data-route="analyze"><span data-icon="chart"></span><span>分析</span><small>Analyze</small></button>
+<button data-route="outputs"><span data-icon="output"></span><span>产出</span><small>Outputs</small></button>
+</nav>
+<div class="sidebar-bottom">
+<button id="automationButton"><span data-icon="activity"></span>自动化与审核<span id="attentionCount" class="nav-count" hidden></span></button>
+<button id="settingsButton"><span data-icon="settings"></span>连接与设置</button>
+<div class="sidebar-status"><span class="status-dot"></span><span id="connectionStatus">正在连接工作区</span></div>
+</div></aside>
+<div class="app-shell">
+<header class="topbar"><div class="breadcrumbs"><span id="breadcrumb">工作区</span><span class="crumb-divider">/</span><span id="breadcrumbDetail">发现</span></div>
+<div class="topbar-actions"><button id="searchButton" class="search-trigger" disabled><span data-icon="search"></span><span>搜索资料、报告和来源</span><kbd>Ctrl K</kbd></button><button id="createRecord" class="assistant-trigger" disabled><span data-icon="plus"></span><span id="createRecordLabel">新建项目记录</span></button><button id="assistantButton" class="assistant-trigger" disabled><span data-icon="sparkles"></span>科研助手</button></div></header>
+<main id="view" tabindex="-1"><div class="loading-state"><span class="loader"></span>正在整理工作区…</div></main>
+</div>
+<aside id="assistant" class="assistant-drawer" aria-label="科研助手" hidden>
+<div class="drawer-header"><div><span class="overline">DEEPSEEK</span><h2>科研助手</h2></div><button id="closeAssistant" class="icon-button" aria-label="收起科研助手"><span data-icon="close"></span></button></div>
+<p id="assistantContext" class="drawer-context">围绕当前项目讨论，修改先给预览。</p>
+<div class="chat-history"><select id="chatHistory" aria-label="历史对话"><option value="">新对话</option></select><button id="newConversation" class="quiet-button">新对话</button><button id="researchTools" class="quiet-button">研究工具</button></div>
+<div id="chatMessages" class="chat-messages" aria-live="polite"></div>
+<form id="chatForm"><textarea id="chatInput" rows="3" required maxlength="8000" aria-label="向科研助手提问" placeholder="问已有证据，或说明你希望怎样修改…"></textarea><div><span>Ctrl Enter 发送</span><button type="submit" class="primary" id="sendChat">发送 <span data-icon="arrow"></span></button></div></form><p id="chatStatus" role="status"></p>
+</aside>
+<dialog id="overlay" aria-labelledby="overlayTitle"><div class="dialog-heading"><h2 id="overlayTitle"></h2><button id="closeOverlay" class="icon-button" aria-label="关闭窗口"><span data-icon="close"></span></button></div><div id="overlayBody"></div></dialog>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body></html>

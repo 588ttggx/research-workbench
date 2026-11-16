@@ -1,0 +1,7 @@
+{
+  "manifest_version": 2,
+  "name": "研序工作区笔记连接",
+  "version": "1.0.2",
+  "description": "通过 Zotero 原生授权核验旧同步，并由原生数据库引擎生成一致备份；不改写科研正文。",
+  "applications": {"zotero": {"id": "research-workspace@local", "update_url": "https://127.0.0.1:8503/api/note-sync/plugin-update", "strict_min_version": "10.0", "strict_max_version": "10.99.99"}}
+}

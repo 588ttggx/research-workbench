@@ -1,0 +1,89 @@
+'use strict';
+async function showMethods(selectedId=""){
+ await ensureWorkspace();
+ const data=await api('/api/methods');if(selectedId&&!data.records.some(r=>r.id===selectedId))throw Error('关联方法尚未登记，请在正式记录核对方法 ID，或从分析区新建方法草稿');
+ const body=modal('方法与质量控制'),chooser=select([['','新建方法草稿'],...data.records.map(r=>[r.id,r.data.title+' · '+(r.archived?'已归档':r.status==='VERIFIED'?'已核对当前版本':'待核对')])],'需要维护的方法'),box=el('div');
+ body.append(el('p',data.scope,'section-subtitle'),field('方法',chooser),box);chooser.value=selectedId;chooser.onchange=draw;draw();
+ function draw(){const current=data.records.find(r=>r.id===chooser.value),p=current?.policy||data.preset;box.replaceChildren();
+  const name=input('方法名称',current?.data.title||'单程弱界面吸收 · 均匀厚样片'),min=input('依据可信频段填写',p.frequency_min_thz??''),max=input('依据可信频段填写',p.frequency_max_thz??''),floor=input('参考峰值的比例',p.reference_floor_fraction),phase=input('已核对的整圈偏移',p.phase_offset_turns),smooth=input('0 表示不去噪',p.savgol_window),baseline=select([['none','不扣基线'],['noise_mean','按明确噪声窗口扣均值']],'基线处理');baseline.value=p.baseline;
+  box.append(field('名称',name),el('p','仅实现近法向、均匀平行厚样片、空气参考和已排除内部反射的弱界面吸收近似。输出为有效样片性质；多层、薄膜、多反射及纯组分反演需使用对应的专业模型。','notice info'));
+  const grid=el('div',null,'form-grid');grid.append(field('可信下限 / THz',min),field('可信上限 / THz',max),field('参考幅值下限比例',floor),field('相位分支 / 圈',phase),field('基线',baseline),field('Savitzky–Golay 窗口',smooth));box.append(grid);
+  const thresholds=el('details'),controls={},labels={snr_db:'SNR / dB（越低越差）',reference_drift_fraction:'参考幅值漂移比例（越高越差）',time_zero_shift_ps:'参考零点漂移 / ps（越高越差）',dynamic_range_db:'动态范围 / dB（越低越差）',humidity_percent:'湿度 / %（越高越差）',water_vapor_metric:'水汽指标（越高越差）'};
+  thresholds.append(el('summary','维护 QC 阈值'),el('p','阈值应来自实际仪器、SOP 或验证记录。阈值或实际记录留空时，该项显示“未评估”；完整通过需要逐项具备依据和实际值。','section-subtitle'));
+  for(const [key,label]of Object.entries(labels)){const warn=input('Warning 阈值',p.thresholds?.[key]?.warning??''),fail=input('Fail 阈值',p.thresholds?.[key]?.fail??'');controls[key]={warn,fail};const row=el('div',null,'form-grid');row.append(field(label+' · Warning',warn),field(label+' · Fail',fail));thresholds.append(row);}box.append(thresholds,extLink('查看方法依据',data.source.url,'text-link'),el('p',data.source.location,'muted'));
+  box.append(btn('保存方法草稿',async()=>{const rules={};for(const [key,v]of Object.entries(controls)){if(v.warn.value.trim()||v.fail.value.trim()){if(!v.warn.value.trim()||!v.fail.value.trim())throw Error('每项 QC 需同时填写 Warning 和 Fail');rules[key]={warning:Number(v.warn.value),fail:Number(v.fail.value)};}}
+   for(const v of [min,max,floor,phase,smooth])if(!v.value.trim())throw Error('请明确填写频段、参考下限、相位分支及处理窗口');const result=await api('/api/methods/save',{id:current?.id,fingerprint:current?.fingerprint,title:name.value,policy:{model:data.preset.model,frequency_min_thz:Number(min.value),frequency_max_thz:Number(max.value),reference_floor_fraction:Number(floor.value),phase_offset_turns:Number(phase.value),baseline:baseline.value,savgol_window:Number(smooth.value),thresholds:rules}});
+   await loadWorkspace();notify('方法已保存到同一主稿；修改后的版本需要重新核对');await showMethods(result.id);},'primary','check'));
+  if(current){const auto=el('div');box.append(auto);renderAnalysisAutomation(auto,current).catch(error=>auto.append(el('p',error.message,'notice')));box.append(btn('编辑方法说明与验证证据',()=>{const doc=objectForPath(current.path);if(!doc)throw Error('原稿索引尚未就绪，请刷新知识区');dismiss();navigate('document',doc.id);},'quiet-button','edit'));
+   if(current.status==='CANDIDATE'){const reason=el('textarea');reason.rows=3;reason.placeholder='实际核对的验证数据、记录位置、适用条件与限制';const agreed=el('input');agreed.type='checkbox';const label=el('label',null,'check-field');label.append(agreed,el('span','我已核对当前方法条件与验证证据'));box.append(field('核对依据',reason),label,btn('确认当前方法可用于分析',async()=>{if(!agreed.checked||!reason.value.trim())throw Error('请核对当前方法并填写具体依据');await api('/api/methods/review',{id:current.id,fingerprint:current.fingerprint,action:'VERIFIED',reason:reason.value});notify('当前版本已记录人工核对；以后修改会重新待核对');await showMethods(current.id);},'quiet-button','check'));}
+  }
+ }
+}
+
+function renderQCChecks(host,qc){
+ const names={PASS:'通过',WARNING:'注意',FAIL:'未通过',UNASSESSED:'未评估'},labels={snr_db:'信噪比 / dB',reference_drift_fraction:'参考幅值漂移',time_zero_shift_ps:'参考零点漂移 / ps',dynamic_range_db:'动态范围 / dB',humidity_percent:'湿度 / %',water_vapor_metric:'水汽指标',instrument_state:'仪器状态',calibration_at_measurement:'测量时的校准有效期',environment_recorded:'温度与湿度记录'};
+ host.append(badge(names[qc.status]||qc.status,qc.status==='FAIL'?'red':qc.status==='PASS'?'green':'orange'),el('p',qc.scope,'section-subtitle'));
+ const table=el('table',null,'data-table'),head=el('tr');for(const title of ['检查项','实际记录','判定','依据与缺失'])head.append(el('th',title));table.append(head);
+ for(const check of qc.checks||[]){const row=el('tr'),value=check.value;row.append(el('td',labels[check.metric]||check.metric),el('td',value==null?'缺少实际记录':typeof value==='object'?Object.entries(value).map(([k,v])=>(k==='temperature_celsius'?'温度 / °C':'湿度 / %')+'：'+(v??'未知')).join('；'):String(typeof value==='number'?Number(value.toPrecision(6)):value)),el('td',names[check.status]||check.status),el('td',(check.reason||'见实际来源')+(check.thresholds?' · 警戒 '+check.thresholds.warning+' / 失败 '+check.thresholds.fail:'')));table.append(row);}const scroll=el('div');scroll.style.overflowX='auto';scroll.append(table);host.append(scroll);const warnings=(qc.checks||[]).filter(c=>c.status==='WARNING').length;if(qc.status==='UNASSESSED'&&warnings)host.append(el('p','已发现 '+warnings+' 项预警，其他缺失项仍需补齐。','notice'));
+}
+
+function showQCRecord(node){
+ const body=modal(node.data.title||'质量检查');renderQCChecks(body,node.data);
+ body.append(btn('打开所属运行与方法',async()=>{const trace=await api('/api/research/trace?id='+encodeURIComponent(node.id)),run=trace.nodes.find(n=>n.id===node.data.run_id);if(!run?.data.analysis_id)throw Error('运行索引未找到，请核查来源');dismiss();navigate('run',run.data.analysis_id);},'primary','chart'));
+ body.append(btn('查看完整来源',async()=>{const trace=await api('/api/research/trace?id='+encodeURIComponent(node.id));const host=el('div');body.append(host);drawProvenanceTrace(host,trace);},'quiet-button','network'));
+}
+
+function renderTHzSummary(host,run){
+ const m=run.metrics;host.append(el('p',m.rows+' 个采样点 · '+m.frequency_points+' 个可信频点 · 实际厚度 '+m.thickness_mm+' mm'),el('p',m.scope,'section-subtitle'));renderQCChecks(host,m.qc);
+ for(const warning of m.warnings||[])host.append(el('p',warning,'notice'));
+ if(run.provenance?.run_id){const query=new URLSearchParams({id:run.provenance.run_id,file:'metrics.json'});host.append(extLink('下载完整频谱与 QC 记录','/api/research/artifact?'+query,'quiet-button'));query.set('file','method.md');host.append(extLink('查看本次冻结的方法','/api/research/artifact?'+query,'quiet-button'));}
+ host.append(btn('维护当前方法',()=>showMethods(run.options.method_id),'quiet-button','settings'));
+ for(const id of run.provenance?.qc_candidates||[]){host.append(btn('核查 '+id,async()=>{await loadWorkspace();const data=await api('/api/research?project='+encodeURIComponent(S.project)),node=data.nodes.find(n=>n.id===id),doc=node&&objectForPath(node.uri);if(!doc)throw Error('候选原稿尚未读取，请刷新');navigate('document',doc.id);},'quiet-button','edit'));}
+}
+
+async function thzAnalysisControls(body){
+ const methods=await api('/api/methods'),panel=el('div'),method=select([['','选择已核对的方法'],...methods.records.filter(m=>m.status==='VERIFIED'&&!m.archived).map(m=>[m.id,m.data.title])],'THz 方法'),columns={};
+ panel.append(el('h3','配对波形与真实条件'),el('p','这里保留样品相对参考的物理时延。请先在分析区“方法与 QC”维护并核对方法；未知条件保持未知，不能默认成已确认。','section-subtitle'),field('方法',method));
+ for(const [key,label]of [['time','时间列'],['sample','样品信号列'],['reference','配对参考列'],['reference_after','后采参考列（可选）']]){columns[key]=select([['','先选择 CSV']],label);panel.append(field(label,columns[key]));}
+ const controls={},labels={independent_sample_id:'独立样品 ID',preparation_id:'制样重复 ID',scan_id:'扫描 ID',batch_id:'材料批次 ID',measurement_date:'实际测量日期 / ISO',experiment_id:'正式实验 ID（接入后关联）',instrument_id:'仪器 ID',calibration_id:'校准记录 ID',calibration_valid_until:'校准有效期 / ISO',signal_unit:'信号幅度单位',thickness_mm:'实际厚度 / mm',temperature_celsius:'实际温度 / °C',humidity_percent:'实际湿度 / %',dynamic_range_db:'仪器动态范围 / dB（可选）',water_vapor_metric:'实际水汽指标（可选）'};
+ const grid=el('div',null,'form-grid');for(const [key,label]of Object.entries(labels)){controls[key]=input(label);grid.append(field(label,controls[key]));}
+ const unit=select([['','单位未知'],['ps','ps'],['fs','fs'],['ns','ns'],['s','s']],'物理时间单位'),instrument=select([['UNKNOWN','未知'],['READY','已确认可用'],['MAINTENANCE','维护中'],['FAULT','故障']],'实际仪器状态');grid.append(field('时间单位',unit),field('仪器状态',instrument));panel.append(grid);
+ const native=await api('/api/rspace/records'),experiments=native.records.filter(n=>n.kind==='ExperimentIndex'&&n.status!=='DELETED_AT_SOURCE'),origin=select([['','手动填写已知条件'],...experiments.map(n=>[n.id,n.id+' · '+n.data.title])],'带入正式实验条件');panel.insertBefore(field('已有正式实验（可选）',origin),grid);
+ origin.onchange=()=>{const record=experiments.find(n=>n.id===origin.value);if(!record)return;const m=record.data.metadata||{},calibration=native.records.find(n=>n.id===m.calibration),values={...m,experiment_id:record.id,independent_sample_id:m.independent_sample_id||m.sample,batch_id:m.batch,instrument_id:m.instrument,calibration_id:m.calibration,measurement_date:m.measurement_date||m.start,calibration_valid_until:calibration?.data.metadata?.valid_until};for(const [key,control]of Object.entries(controls))control.value=values[key]||'';unit.value=['s','ns','ps','fs'].includes(m.time_unit)?m.time_unit:'';instrument.value=['READY','FAULT','MAINTENANCE'].includes(m.instrument_state)?m.instrument_state:'UNKNOWN';notify('已带入原生记录中的明确字段；缺失条件仍需补齐并核对配对与模型适用范围');};
+ const noiseStart=input('起始序号（含）'),noiseEnd=input('结束序号（不含）'),noise=el('div',null,'form-grid');noise.append(field('无脉冲噪声窗口起点',noiseStart),field('噪声窗口终点',noiseEnd));panel.append(noise);
+ const paired=el('input'),geometry=el('input');paired.type=geometry.type='checkbox';const pl=el('label',null,'check-field'),gl=el('label',null,'check-field');pl.append(paired,el('span','已确认当前信号与参考的实际配对及相同幅度单位'));gl.append(geometry,el('span','已确认近法向、均匀平行厚样片、空气参考、弱界面吸收并排除内部反射'));panel.append(pl,gl);body.append(panel);panel.hidden=true;
+ return {panel,update(preview){for(const [key,control]of Object.entries(columns)){control.replaceChildren(...[['',key==='reference_after'?'不使用':'选择实际列'],...preview.numeric.map(c=>[c,c])].map(([value,text])=>{const o=el('option',text);o.value=value;return o;}));}},options(){const selected=methods.records.find(m=>m.id===method.value);if(!selected||selected.status!=='VERIFIED')throw Error('请先维护并核对方法');const metadata={time_unit:unit.value,instrument_state:instrument.value,reference_pairing_confirmed:paired.checked,geometry_confirmed:geometry.checked};for(const key of ['normal_incidence','homogeneous_parallel_slab','air_reference','weak_interface_absorption','internal_echoes_excluded'])metadata[key]=geometry.checked;
+   for(const [key,control]of Object.entries(controls)){if(control.value.trim())metadata[key]=['thickness_mm','temperature_celsius','humidity_percent','dynamic_range_db','water_vapor_metric'].includes(key)?Number(control.value):control.value.trim();}
+   if((!!noiseStart.value.trim())!==(!!noiseEnd.value.trim()))throw Error('噪声窗口起止需同时填写');const noise=noiseStart.value.trim()||noiseEnd.value.trim()?[Number(noiseStart.value),Number(noiseEnd.value)]:undefined;
+   return {method_id:selected.id,method_fingerprint:selected.fingerprint,columns:Object.fromEntries(Object.entries(columns).filter(([,v])=>v.value).map(([k,v])=>[k,v.value])),metadata,...(noise?{noise_indices:noise}:{})};}};
+}
+
+async function renderAnalysisAutomation(host,method,options={}){
+ const data=options.snapshot||await api('/api/analysis-automation'),profile=data.records.find(p=>p.method_id===method.id)||{revision:0,enabled:false};
+ const detail=el('details');detail.append(el('summary','实验完成后的自动接续 · '+(profile.enabled?'已启用':'未启用')),el('p',data.scope,'section-subtitle'));
+ if(profile.progress?.reason)detail.append(el('p',profile.progress.reason,'notice info'));
+ if(profile.enabled&&(!profile.method_current||!profile.code_current))detail.append(el('p','当前方法或计算实现已变化，自动分析已停止等待核对。','notice'));
+ const canConfigure=method.status==='VERIFIED'&&!method.archived;const root=input('实际实验 CSV 文件所在目录',profile.root||''),nativeProject=input('RSpace 中填写的 Project ID',profile.native_project||S.project),project=select([...new Set([...(S.workspace.projects||[]),profile.project||S.project])].map(p=>[p,p]),'工作区关联项目'),controls={},grid=el('div',null,'form-grid');project.value=profile.project||S.project;
+ for(const [key,label]of [['time','时间列名'],['sample','样品列名'],['reference','参考列名'],['reference_after','后采参考列名（可选）']]){controls[key]=input('CSV 原始列名',profile.columns?.[key]||'');grid.append(field(label,controls[key]));}
+ const start=input('无脉冲窗口起点',profile.noise_indices?.[0]??''),end=input('无脉冲窗口终点',profile.noise_indices?.[1]??'');grid.append(field('噪声起点（含）',start),field('噪声终点（不含）',end));detail.append(field('工作区关联项目',project),field('已批准的数据目录',root),field('原生项目 ID',nativeProject),grid,el('p','原生实验选择 Method ID = '+method.id+'，完成状态填写 COMPLETED；Raw Data URI 指定 CSV。样品、批次、仪器、校准、实际条件与配对确认从原记录带入。缺条件会明确等待。','section-subtitle'));
+ const enabled=el('input');enabled.type='checkbox';enabled.checked=!!profile.enabled;const label=el('label',null,'check-field');label.append(enabled,el('span','输入满足条件后自动 QC、分析并登记运行'));detail.append(label);
+ detail.append(btn('保存接续设置',async()=>{if((!!start.value.trim())!==(!!end.value.trim()))throw Error('噪声起止需要同时填写');await api('/api/analysis-automation/configure',!canConfigure&&!enabled.checked&&profile.enabled?{method_id:method.id,revision:profile.revision,enabled:false}:{method_id:method.id,method_fingerprint:method.fingerprint,revision:profile.revision,enabled:enabled.checked,project:project.value,native_project:nativeProject.value,root:root.value,columns:Object.fromEntries(Object.entries(controls).filter(([,c])=>c.value.trim()).map(([k,c])=>[k,c.value.trim()])),noise_indices:start.value.trim()?[Number(start.value),Number(end.value)]:null});notify('自动接续设置已保存；已在运行的步骤会保留结果，暂停后不启动下一项');if(options.onSaved)await options.onSaved();else await showMethods(method.id);},'quiet-button','check'));
+ if(profile.enabled)detail.append(btn('核对来源并立即接续',async()=>{await job('/api/analysis-automation/run',{});notify('原生状态已核对，满足条件的分析在后台接续');},'quiet-button','activity'));
+ for(const item of profile.items||[]){const row=el('div',null,'card');row.append(el('strong',item.experiment_id),el('p',item.reason||(item.status==='completed'?'已保存运行与产物':'数据已接收，等待后续步骤'),'section-subtitle'));if(item.qc_status)row.append(badge('QC · '+({PASS:'通过',WARNING:'注意',FAIL:'未通过',UNASSESSED:'未评估'}[item.qc_status]||item.qc_status),item.qc_status==='FAIL'?'red':item.qc_status==='PASS'?'green':'orange'));if(item.status==='source_changed')for(const change of item.source_changes||[])row.append(el('p',change.id+' · 原记录 '+(change.before?docTime({created:change.before}):'未记录时间')+' → 当前 '+(change.after?docTime({created:change.after}):'未记录时间'),'muted'));if(item.source_uri)row.append(extLink('打开正式实验',item.source_uri,'quiet-button'));if(item.analysis_id)row.append(btn('打开所属分析',async()=>{dismiss();if(profile.project!==S.project){S.project=profile.project;await loadWorkspace();}navigate('run',item.analysis_id);},'quiet-button','chart'));if(item.status==='source_changed')row.append(btn('已核对，保留原运行',async()=>{await api('/api/analysis-automation/acknowledge',{method_id:method.id,experiment_id:item.experiment_id,fingerprint:item.fingerprint});if(options.onSaved)await options.onSaved();else await showMethods(method.id);notify('已记录当前版本核对；原分析与历史保持可回溯');},'quiet-button','check'));detail.append(row);}
+ if(!canConfigure){for(const control of [project,root,nativeProject,start,end,...Object.values(controls)])control.disabled=true;enabled.disabled=true;if(!profile.enabled)detail.append(el('p','先核对当前方法；未通过的方法不能启用自动分析。','notice'));else{enabled.disabled=false;enabled.checked=false;}}
+ host.append(detail);
+}
+
+async function renderReceivedData(host,token){
+ const data=await api('/api/research?section=received&project='+encodeURIComponent(S.project));if(token!==S.renderToken)return;
+ const rows=data.nodes.filter(n=>n.kind==='Dataset'&&n.owner==='DataStorage+DVC'&&n.status==='CAPTURED');if(!rows.length)return;
+ const box=section('已接收，等待分析条件','原始版本保留；补齐来源条件后自动接续'),list=el('div',null,'list');
+ for(const node of rows){const row=el('div',null,'list-row'),copy=el('div',null,'row-copy');copy.append(el('strong',node.data.title||node.id),el('p',node.id+' · 数据已保存，尚未生成结果'));row.append(ic('file'),copy,btn('查看已保存数据来源',()=>showRunTrace(node.id),'quiet-button','network'));if(node.data.source_uri)row.append(extLink('去正式记录补全条件',node.data.source_uri,'quiet-button'));list.append(row);}box.append(list);host.append(box);
+}
+
+async function renderAutomaticProgress(host,token){
+ const data=await api('/api/analysis-automation');if(token!==S.renderToken)return;
+ const profiles=data.records.filter(p=>p.project===S.project&&(p.enabled||p.items?.length));if(!profiles.length)return;
+ const sectionNode=section('实验后的自动接续','同一方法入口维护，执行进度与质量结论分别显示');
+ for(const p of profiles){const waiting=p.items.filter(i=>i.status==='waiting_conditions').length,changed=p.items.filter(i=>i.status==='source_changed').length,failed=p.items.filter(i=>i.qc_status==='FAIL').length,row=el('div',null,'list-row'),copy=el('div',null,'row-copy');copy.append(el('strong',p.method_title),el('p',(p.enabled?'已启用':'已暂停')+' · 等待条件 '+waiting+' · 记录待核对 '+changed+' · QC 未通过 '+failed));row.append(ic('activity'),copy,btn('查看进度与维护',()=>showMethods(p.method_id),'quiet-button','settings'));sectionNode.append(row);}host.append(sectionNode);
+}

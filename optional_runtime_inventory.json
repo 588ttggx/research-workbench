@@ -1,0 +1,1028 @@
+{
+  "format": "workbench-optional-runtime-inventory-v1",
+  "packages": [
+    {
+      "name": "Qwen3 Embedding 4B (Ollama)",
+      "version": "manifest-sha256:a1bc421fab36feed5e99823cf8a15fafaaa8b0f0b946e7ddeb2fce8c60d6ac12",
+      "license": "Apache-2.0",
+      "source": "https://huggingface.co/Qwen/Qwen3-Embedding-4B"
+    },
+    {
+      "name": "R package AsioHeaders",
+      "version": "1.30.2-1",
+      "license": "BSL-1.0",
+      "source": "https://github.com/eddelbuettel/asioheaders"
+    },
+    {
+      "name": "R package R6",
+      "version": "2.6.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://r6.r-lib.org"
+    },
+    {
+      "name": "R package RColorBrewer",
+      "version": "1.1-3",
+      "license": "Apache License 2.0",
+      "source": "https://cran.r-project.org/package=RColorBrewer"
+    },
+    {
+      "name": "R package RCurl",
+      "version": "1.98-1.20",
+      "license": "BSD_3_clause + file LICENSE",
+      "source": "https://cran.r-project.org/package=RCurl"
+    },
+    {
+      "name": "R package Rcpp",
+      "version": "1.1.2",
+      "license": "GPL (>= 2)",
+      "source": "https://www.rcpp.org"
+    },
+    {
+      "name": "R package RcppArmadillo",
+      "version": "15.6.0-1",
+      "license": "GPL (>= 2)",
+      "source": "https://github.com/RcppCore/RcppArmadillo"
+    },
+    {
+      "name": "R package S7",
+      "version": "0.2.2",
+      "license": "MIT + file LICENSE",
+      "source": "https://rconsortium.github.io/S7/"
+    },
+    {
+      "name": "R package SnowballC",
+      "version": "0.7.1",
+      "license": "BSD_3_clause + file LICENSE",
+      "source": "https://github.com/nalimilan/R.TeMiS"
+    },
+    {
+      "name": "R package XML",
+      "version": "3.99-0.25",
+      "license": "BSD_3_clause + file LICENSE",
+      "source": "https://cran.r-project.org/package=XML"
+    },
+    {
+      "name": "R package askpass",
+      "version": "1.2.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://r-lib.r-universe.dev/askpass"
+    },
+    {
+      "name": "R package base64enc",
+      "version": "0.1-6",
+      "license": "GPL-2 | GPL-3",
+      "source": "https://www.rforge.net/base64enc"
+    },
+    {
+      "name": "R package bibliometrix",
+      "version": "5.5.0",
+      "license": "GPL-3",
+      "source": "https://www.bibliometrix.org"
+    },
+    {
+      "name": "R package bibliometrixData",
+      "version": "0.3.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://cran.r-project.org/package=bibliometrixData"
+    },
+    {
+      "name": "R package bit",
+      "version": "4.6.0",
+      "license": "GPL-2 | GPL-3",
+      "source": "https://github.com/r-lib/bit"
+    },
+    {
+      "name": "R package bit64",
+      "version": "4.8.6",
+      "license": "GPL-2 | GPL-3",
+      "source": "https://github.com/r-lib/bit64"
+    },
+    {
+      "name": "R package bitops",
+      "version": "1.1-0",
+      "license": "GPL (>= 2)",
+      "source": "https://github.com/mmaechler/R-bitops"
+    },
+    {
+      "name": "R package bookdown",
+      "version": "0.48",
+      "license": "GPL-3",
+      "source": "https://github.com/rstudio/bookdown"
+    },
+    {
+      "name": "R package bslib",
+      "version": "0.12.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://rstudio.github.io/bslib/"
+    },
+    {
+      "name": "R package ca",
+      "version": "0.72",
+      "license": "GPL",
+      "source": "http://www.carme-n.org/"
+    },
+    {
+      "name": "R package cachem",
+      "version": "1.1.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://cachem.r-lib.org/"
+    },
+    {
+      "name": "R package cellranger",
+      "version": "1.1.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/rsheets/cellranger"
+    },
+    {
+      "name": "R package chromote",
+      "version": "0.5.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://rstudio.github.io/chromote/"
+    },
+    {
+      "name": "R package cli",
+      "version": "3.6.6",
+      "license": "MIT + file LICENSE",
+      "source": "https://cli.r-lib.org"
+    },
+    {
+      "name": "R package clipr",
+      "version": "0.8.1",
+      "license": "GPL-3",
+      "source": "https://github.com/mdlincoln/clipr"
+    },
+    {
+      "name": "R package commonmark",
+      "version": "2.0.0",
+      "license": "BSD_2_clause + file LICENSE",
+      "source": "https://docs.ropensci.org/commonmark/"
+    },
+    {
+      "name": "R package contentanalysis",
+      "version": "1.1.1",
+      "license": "GPL (>= 3)",
+      "source": "https://github.com/massimoaria/contentanalysis"
+    },
+    {
+      "name": "R package cpp11",
+      "version": "0.5.5",
+      "license": "MIT + file LICENSE",
+      "source": "https://cpp11.r-lib.org"
+    },
+    {
+      "name": "R package crayon",
+      "version": "1.5.3",
+      "license": "MIT + file LICENSE",
+      "source": "https://r-lib.github.io/crayon/"
+    },
+    {
+      "name": "R package crosstalk",
+      "version": "1.2.2",
+      "license": "MIT + file LICENSE",
+      "source": "https://rstudio.github.io/crosstalk/"
+    },
+    {
+      "name": "R package curl",
+      "version": "8.0.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://jeroen.r-universe.dev/curl"
+    },
+    {
+      "name": "R package data.table",
+      "version": "1.18.6.1",
+      "license": "MPL-2.0 | file LICENSE",
+      "source": "https://r-datatable.com"
+    },
+    {
+      "name": "R package digest",
+      "version": "0.6.39",
+      "license": "GPL (>= 2)",
+      "source": "https://github.com/eddelbuettel/digest"
+    },
+    {
+      "name": "R package dimensionsR",
+      "version": "0.0.3",
+      "license": "GPL-3",
+      "source": "https://github.com/massimoaria/dimensionsR"
+    },
+    {
+      "name": "R package dplyr",
+      "version": "1.2.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://dplyr.tidyverse.org"
+    },
+    {
+      "name": "R package evaluate",
+      "version": "1.0.5",
+      "license": "MIT + file LICENSE",
+      "source": "https://evaluate.r-lib.org/"
+    },
+    {
+      "name": "R package farver",
+      "version": "2.1.2",
+      "license": "MIT + file LICENSE",
+      "source": "https://farver.data-imaginist.com"
+    },
+    {
+      "name": "R package fastmap",
+      "version": "1.2.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://r-lib.github.io/fastmap/"
+    },
+    {
+      "name": "R package fontawesome",
+      "version": "0.5.3",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/rstudio/fontawesome"
+    },
+    {
+      "name": "R package forcats",
+      "version": "1.0.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://forcats.tidyverse.org/"
+    },
+    {
+      "name": "R package fresh",
+      "version": "0.2.2",
+      "license": "GPL-3",
+      "source": "https://github.com/dreamRs/fresh"
+    },
+    {
+      "name": "R package fs",
+      "version": "2.1.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://fs.r-lib.org"
+    },
+    {
+      "name": "R package future",
+      "version": "1.76.0",
+      "license": "Apache License (>= 2)",
+      "source": "https://future.futureverse.org"
+    },
+    {
+      "name": "R package generics",
+      "version": "0.1.4",
+      "license": "MIT + file LICENSE",
+      "source": "https://generics.r-lib.org"
+    },
+    {
+      "name": "R package ggforce",
+      "version": "0.5.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://ggforce.data-imaginist.com"
+    },
+    {
+      "name": "R package ggmap",
+      "version": "4.0.2",
+      "license": "GPL-2",
+      "source": "https://github.com/dkahle/ggmap"
+    },
+    {
+      "name": "R package ggplot2",
+      "version": "4.0.3",
+      "license": "MIT + file LICENSE",
+      "source": "https://ggplot2.tidyverse.org"
+    },
+    {
+      "name": "R package ggraph",
+      "version": "2.2.2",
+      "license": "MIT + file LICENSE",
+      "source": "https://ggraph.data-imaginist.com"
+    },
+    {
+      "name": "R package ggrepel",
+      "version": "0.9.8",
+      "license": "GPL-3 | file LICENSE",
+      "source": "https://ggrepel.slowkow.com/"
+    },
+    {
+      "name": "R package globals",
+      "version": "0.19.1",
+      "license": "LGPL (>= 2.1)",
+      "source": "https://globals.futureverse.org"
+    },
+    {
+      "name": "R package glue",
+      "version": "1.8.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://glue.tidyverse.org/"
+    },
+    {
+      "name": "R package graphlayouts",
+      "version": "1.2.5",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/schochastics/graphlayouts"
+    },
+    {
+      "name": "R package gridExtra",
+      "version": "2.3.1",
+      "license": "GPL (>= 2)",
+      "source": "https://cran.r-project.org/package=gridExtra"
+    },
+    {
+      "name": "R package gtable",
+      "version": "0.3.6",
+      "license": "MIT + file LICENSE",
+      "source": "https://gtable.r-lib.org"
+    },
+    {
+      "name": "R package highr",
+      "version": "0.12",
+      "license": "GPL",
+      "source": "https://github.com/yihui/highr"
+    },
+    {
+      "name": "R package hms",
+      "version": "1.1.4",
+      "license": "MIT + file LICENSE",
+      "source": "https://hms.tidyverse.org/"
+    },
+    {
+      "name": "R package htmltools",
+      "version": "0.5.9",
+      "license": "GPL (>= 2)",
+      "source": "https://github.com/rstudio/htmltools"
+    },
+    {
+      "name": "R package htmlwidgets",
+      "version": "1.6.4",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/ramnathv/htmlwidgets"
+    },
+    {
+      "name": "R package httpuv",
+      "version": "1.6.17",
+      "license": "GPL (>= 2) | file LICENSE",
+      "source": "https://rstudio.github.io/httpuv/"
+    },
+    {
+      "name": "R package httr",
+      "version": "1.4.9",
+      "license": "MIT + file LICENSE",
+      "source": "https://httr.r-lib.org/"
+    },
+    {
+      "name": "R package httr2",
+      "version": "1.3.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://httr2.r-lib.org"
+    },
+    {
+      "name": "R package igraph",
+      "version": "2.3.3",
+      "license": "GPL (>= 2)",
+      "source": "https://r.igraph.org/"
+    },
+    {
+      "name": "R package isoband",
+      "version": "0.3.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://isoband.r-lib.org"
+    },
+    {
+      "name": "R package janeaustenr",
+      "version": "1.0.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/juliasilge/janeaustenr"
+    },
+    {
+      "name": "R package jpeg",
+      "version": "0.1-11",
+      "license": "GPL-2 | GPL-3",
+      "source": "https://www.rforge.net/jpeg/"
+    },
+    {
+      "name": "R package jquerylib",
+      "version": "0.1.4",
+      "license": "MIT + file LICENSE",
+      "source": "https://cran.r-project.org/package=jquerylib"
+    },
+    {
+      "name": "R package jsonlite",
+      "version": "2.0.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://jeroen.r-universe.dev/jsonlite"
+    },
+    {
+      "name": "R package knitr",
+      "version": "1.52",
+      "license": "GPL",
+      "source": "https://yihui.org/knitr/"
+    },
+    {
+      "name": "R package labeling",
+      "version": "0.4.3",
+      "license": "MIT + file LICENSE | Unlimited",
+      "source": "https://cran.r-project.org/package=labeling"
+    },
+    {
+      "name": "R package later",
+      "version": "1.4.8",
+      "license": "MIT + file LICENSE",
+      "source": "https://later.r-lib.org"
+    },
+    {
+      "name": "R package lazyeval",
+      "version": "0.2.3",
+      "license": "GPL-3",
+      "source": "https://cran.r-project.org/package=lazyeval"
+    },
+    {
+      "name": "R package lifecycle",
+      "version": "1.0.5",
+      "license": "MIT + file LICENSE",
+      "source": "https://lifecycle.r-lib.org/"
+    },
+    {
+      "name": "R package listenv",
+      "version": "1.0.0",
+      "license": "Apache License (>= 2)",
+      "source": "https://listenv.futureverse.org"
+    },
+    {
+      "name": "R package magrittr",
+      "version": "2.0.5",
+      "license": "MIT + file LICENSE",
+      "source": "https://magrittr.tidyverse.org"
+    },
+    {
+      "name": "R package maps",
+      "version": "3.4.3",
+      "license": "GPL-2",
+      "source": "https://github.com/adeckmyn/maps"
+    },
+    {
+      "name": "R package memoise",
+      "version": "2.0.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://memoise.r-lib.org"
+    },
+    {
+      "name": "R package mime",
+      "version": "0.13",
+      "license": "GPL",
+      "source": "https://github.com/yihui/mime"
+    },
+    {
+      "name": "R package openalexR",
+      "version": "3.1.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/ropensci/openalexR"
+    },
+    {
+      "name": "R package openssl",
+      "version": "2.4.2",
+      "license": "MIT + file LICENSE",
+      "source": "https://jeroen.r-universe.dev/openssl"
+    },
+    {
+      "name": "R package openxlsx",
+      "version": "4.2.9",
+      "license": "MIT + file LICENSE",
+      "source": "https://ycphs.github.io/openxlsx/index.html"
+    },
+    {
+      "name": "R package otel",
+      "version": "0.2.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://otel.r-lib.org"
+    },
+    {
+      "name": "R package pagedown",
+      "version": "0.25",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/rstudio/pagedown"
+    },
+    {
+      "name": "R package parallelly",
+      "version": "1.48.0",
+      "license": "LGPL (>= 2.1)",
+      "source": "https://parallelly.futureverse.org"
+    },
+    {
+      "name": "R package pdftools",
+      "version": "3.9.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://ropensci.r-universe.dev/pdftools"
+    },
+    {
+      "name": "R package pillar",
+      "version": "1.11.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://pillar.r-lib.org/"
+    },
+    {
+      "name": "R package pkgconfig",
+      "version": "2.0.3",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/r-lib/pkgconfig"
+    },
+    {
+      "name": "R package plotly",
+      "version": "4.12.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://plotly-r.com"
+    },
+    {
+      "name": "R package plyr",
+      "version": "1.8.9",
+      "license": "MIT + file LICENSE",
+      "source": "http://had.co.nz/plyr"
+    },
+    {
+      "name": "R package png",
+      "version": "0.1-9",
+      "license": "GPL-2 | GPL-3",
+      "source": "https://www.rforge.net/png/"
+    },
+    {
+      "name": "R package polyclip",
+      "version": "1.10-7",
+      "license": "BSL",
+      "source": "https://www.angusj.com"
+    },
+    {
+      "name": "R package prettyunits",
+      "version": "1.2.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/r-lib/prettyunits"
+    },
+    {
+      "name": "R package processx",
+      "version": "3.9.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://processx.r-lib.org"
+    },
+    {
+      "name": "R package progress",
+      "version": "1.2.3",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/r-lib/progress"
+    },
+    {
+      "name": "R package promises",
+      "version": "1.5.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://rstudio.github.io/promises/"
+    },
+    {
+      "name": "R package ps",
+      "version": "1.9.3",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/r-lib/ps"
+    },
+    {
+      "name": "R package pubmedR",
+      "version": "1.0.2",
+      "license": "GPL-3",
+      "source": "https://github.com/massimoaria/pubmedR"
+    },
+    {
+      "name": "R package purrr",
+      "version": "1.2.2",
+      "license": "MIT + file LICENSE",
+      "source": "https://purrr.tidyverse.org/"
+    },
+    {
+      "name": "R package qpdf",
+      "version": "1.4.1",
+      "license": "Apache License 2.0",
+      "source": "https://docs.ropensci.org/qpdf/"
+    },
+    {
+      "name": "R package rappdirs",
+      "version": "0.3.4",
+      "license": "MIT + file LICENSE",
+      "source": "https://rappdirs.r-lib.org"
+    },
+    {
+      "name": "R package readr",
+      "version": "2.2.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://readr.tidyverse.org"
+    },
+    {
+      "name": "R package readxl",
+      "version": "1.5.0.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://readxl.tidyverse.org"
+    },
+    {
+      "name": "R package rematch",
+      "version": "2.0.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/gaborcsardi/rematch"
+    },
+    {
+      "name": "R package rentrez",
+      "version": "1.2.4",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/ropensci/rentrez/"
+    },
+    {
+      "name": "R package rlang",
+      "version": "1.3.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://rlang.r-lib.org"
+    },
+    {
+      "name": "R package rmarkdown",
+      "version": "2.32",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/rstudio/rmarkdown"
+    },
+    {
+      "name": "R package rscopus",
+      "version": "0.9.0",
+      "license": "GPL-2",
+      "source": "https://dev.elsevier.com/sc_apis.html"
+    },
+    {
+      "name": "R package rstudioapi",
+      "version": "0.19.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://rstudio.github.io/rstudioapi/"
+    },
+    {
+      "name": "R package sass",
+      "version": "0.4.10",
+      "license": "MIT + file LICENSE",
+      "source": "https://rstudio.github.io/sass/"
+    },
+    {
+      "name": "R package scales",
+      "version": "1.4.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://scales.r-lib.org"
+    },
+    {
+      "name": "R package servr",
+      "version": "0.33",
+      "license": "GPL",
+      "source": "https://github.com/yihui/servr"
+    },
+    {
+      "name": "R package shiny",
+      "version": "1.14.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://shiny.posit.co/"
+    },
+    {
+      "name": "R package shinyWidgets",
+      "version": "0.9.1",
+      "license": "GPL-3",
+      "source": "https://github.com/dreamRs/shinyWidgets"
+    },
+    {
+      "name": "R package shinycssloaders",
+      "version": "1.1.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/daattali/shinycssloaders"
+    },
+    {
+      "name": "R package shinydashboard",
+      "version": "0.7.3",
+      "license": "MIT + file LICENSE",
+      "source": "https://rstudio.github.io/shinydashboard/"
+    },
+    {
+      "name": "R package shinydashboardPlus",
+      "version": "2.0.6",
+      "license": "GPL (>= 2) | file LICENSE",
+      "source": "https://github.com/RinteRface/shinydashboardPlus"
+    },
+    {
+      "name": "R package shinyjs",
+      "version": "2.1.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://deanattali.com/shinyjs/"
+    },
+    {
+      "name": "R package sourcetools",
+      "version": "0.1.7-2",
+      "license": "MIT + file LICENSE",
+      "source": "https://cran.r-project.org/package=sourcetools"
+    },
+    {
+      "name": "R package sparkline",
+      "version": "2.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://cran.r-project.org/package=sparkline"
+    },
+    {
+      "name": "R package stringdist",
+      "version": "0.9.17",
+      "license": "GPL-3",
+      "source": "https://github.com/markvanderloo/stringdist"
+    },
+    {
+      "name": "R package stringi",
+      "version": "1.8.9",
+      "license": "file LICENSE",
+      "source": "https://stringi.gagolewski.com/"
+    },
+    {
+      "name": "R package stringr",
+      "version": "1.6.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://stringr.tidyverse.org"
+    },
+    {
+      "name": "R package sys",
+      "version": "3.4.3",
+      "license": "MIT + file LICENSE",
+      "source": "https://jeroen.r-universe.dev/sys"
+    },
+    {
+      "name": "R package systemfonts",
+      "version": "1.3.2",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/r-lib/systemfonts"
+    },
+    {
+      "name": "R package tibble",
+      "version": "3.3.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://tibble.tidyverse.org/"
+    },
+    {
+      "name": "R package tidygraph",
+      "version": "1.3.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://tidygraph.data-imaginist.com"
+    },
+    {
+      "name": "R package tidyr",
+      "version": "1.3.2",
+      "license": "MIT + file LICENSE",
+      "source": "https://tidyr.tidyverse.org"
+    },
+    {
+      "name": "R package tidyselect",
+      "version": "1.2.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://tidyselect.r-lib.org"
+    },
+    {
+      "name": "R package tidytext",
+      "version": "0.4.3",
+      "license": "MIT + file LICENSE",
+      "source": "https://juliasilge.github.io/tidytext/"
+    },
+    {
+      "name": "R package tinytex",
+      "version": "0.61",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/rstudio/tinytex"
+    },
+    {
+      "name": "R package tokenizers",
+      "version": "0.3.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://docs.ropensci.org/tokenizers/"
+    },
+    {
+      "name": "R package tweenr",
+      "version": "2.0.3",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/thomasp85/tweenr"
+    },
+    {
+      "name": "R package tzdb",
+      "version": "0.5.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://tzdb.r-lib.org"
+    },
+    {
+      "name": "R package utf8",
+      "version": "1.2.6",
+      "license": "Apache License (== 2.0) | file LICENSE",
+      "source": "https://krlmlr.github.io/utf8/"
+    },
+    {
+      "name": "R package vctrs",
+      "version": "0.7.3",
+      "license": "MIT + file LICENSE",
+      "source": "https://vctrs.r-lib.org/"
+    },
+    {
+      "name": "R package viridis",
+      "version": "0.6.5",
+      "license": "MIT + file LICENSE",
+      "source": "https://sjmgarnier.github.io/viridis/"
+    },
+    {
+      "name": "R package viridisLite",
+      "version": "0.4.3",
+      "license": "MIT + file LICENSE",
+      "source": "https://sjmgarnier.github.io/viridisLite/"
+    },
+    {
+      "name": "R package visNetwork",
+      "version": "2.1.4",
+      "license": "MIT + file LICENSE",
+      "source": "https://datastorm-open.github.io/visNetwork/"
+    },
+    {
+      "name": "R package vroom",
+      "version": "1.7.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://vroom.tidyverse.org"
+    },
+    {
+      "name": "R package waiter",
+      "version": "0.2.5.1",
+      "license": "MIT + file LICENSE",
+      "source": "https://waiter.john-coene.com/"
+    },
+    {
+      "name": "R package websocket",
+      "version": "1.4.4",
+      "license": "GPL-2",
+      "source": "https://cran.r-project.org/package=websocket"
+    },
+    {
+      "name": "R package withr",
+      "version": "3.0.3",
+      "license": "MIT + file LICENSE",
+      "source": "https://withr.r-lib.org"
+    },
+    {
+      "name": "R package wordcloud2",
+      "version": "0.2.1",
+      "license": "GPL-2",
+      "source": "https://github.com/lchiffon/wordcloud2"
+    },
+    {
+      "name": "R package xfun",
+      "version": "0.61",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/yihui/xfun"
+    },
+    {
+      "name": "R package xml2",
+      "version": "1.6.0",
+      "license": "MIT + file LICENSE",
+      "source": "https://xml2.r-lib.org"
+    },
+    {
+      "name": "R package xtable",
+      "version": "1.8-8",
+      "license": "GPL (>= 2)",
+      "source": "http://xtable.r-forge.r-project.org/"
+    },
+    {
+      "name": "R package yaml",
+      "version": "2.3.12",
+      "license": "BSD_3_clause + file LICENSE",
+      "source": "https://yaml.r-lib.org"
+    },
+    {
+      "name": "R package zip",
+      "version": "3.0.2",
+      "license": "MIT + file LICENSE",
+      "source": "https://github.com/r-lib/zip"
+    },
+    {
+      "name": "graphviz",
+      "version": "16.1.0",
+      "license": "EPL-2.0",
+      "source": "https://gitlab.com/graphviz/graphviz/-/tree/16.1.0"
+    },
+    {
+      "name": "ollama",
+      "version": "0.40.0",
+      "license": "MIT and bundled runtime licenses",
+      "source": "https://github.com/ollama/ollama/releases/tag/v0.40.0"
+    },
+    {
+      "name": "powershell",
+      "version": "7.6.9",
+      "license": "MIT and third-party notices",
+      "source": "https://github.com/PowerShell/PowerShell/releases/tag/v7.6.9"
+    },
+    {
+      "name": "r",
+      "version": "4.6.1",
+      "license": "GPL-2.0-or-later",
+      "source": "https://cran.r-project.org/"
+    }
+  ],
+  "components": [
+    {
+      "id": "r",
+      "archive": "runtime-r.zip",
+      "required": false,
+      "extract_to": ".",
+      "group": "r",
+      "size_bytes": 326471814,
+      "sha256": "7e3d36bcbca851802eb69c749b81d2001d9f7a81dee8ef0adc600a9774982954",
+      "expanded_size_bytes": 572191327,
+      "file_count": 15740
+    },
+    {
+      "id": "graphviz",
+      "archive": "runtime-graphviz.zip",
+      "required": false,
+      "extract_to": ".",
+      "group": "graphviz",
+      "size_bytes": 10426385,
+      "sha256": "97c27e3b405d720e3d66aef31b9299cf2c3bda11b7b66147e265a40f6d5cd5a9",
+      "expanded_size_bytes": 21505364,
+      "file_count": 304
+    },
+    {
+      "id": "powershell",
+      "archive": "runtime-powershell.zip",
+      "required": false,
+      "extract_to": ".",
+      "group": "powershell",
+      "size_bytes": 114785907,
+      "sha256": "e9c6af8f9f37fd43bb32f948c15f47cca4b880a1cc9cff2a9ad3b14c2a3223b5",
+      "expanded_size_bytes": 256666658,
+      "file_count": 658
+    },
+    {
+      "id": "ollama",
+      "archive": "runtime-ollama.zip",
+      "required": false,
+      "extract_to": ".",
+      "group": "ollama",
+      "size_bytes": 1499043845,
+      "sha256": "927f915fed764b610c14d2f7de410f8d19a41c7137f15b12eeacf009288563a3",
+      "expanded_size_bytes": 1941803925,
+      "file_count": 83
+    },
+    {
+      "id": "qwen4b",
+      "archive": "runtime-qwen4b.zip",
+      "required": false,
+      "extract_to": ".",
+      "group": "qwen4b",
+      "size_bytes": 6312,
+      "sha256": "6b6e7aef2ea951b1dda422cc6bc171c56e4b8531b1659422cb28f0dd41689ab5",
+      "expanded_size_bytes": 14307,
+      "file_count": 4
+    },
+    {
+      "id": "qwen4b-part001",
+      "archive": "runtime-qwen4b-part001.zip",
+      "required": false,
+      "extract_to": ".",
+      "group": "qwen4b",
+      "size_bytes": 495,
+      "sha256": "bee530f0d12a5633741bae93fa442b121d49a6ed11c96e22726fee7a26dae560",
+      "expanded_size_bytes": 265,
+      "file_count": 1
+    },
+    {
+      "id": "qwen4b-part002",
+      "archive": "runtime-qwen4b-part002.zip",
+      "required": false,
+      "extract_to": ".",
+      "group": "qwen4b",
+      "size_bytes": 1053767637,
+      "sha256": "149f4a7d7d036ae367466e8a14f8e8fc1f1d6b068458583d1eab9847d9ea07eb",
+      "expanded_size_bytes": 1073741824,
+      "file_count": 1
+    },
+    {
+      "id": "qwen4b-part003",
+      "archive": "runtime-qwen4b-part003.zip",
+      "required": false,
+      "extract_to": ".",
+      "group": "qwen4b",
+      "size_bytes": 1055137643,
+      "sha256": "67fdaa9683e276270b33c0f8f8a0468d434341104a990ccfc7fb7533a3cbff4b",
+      "expanded_size_bytes": 1073741824,
+      "file_count": 1
+    },
+    {
+      "id": "qwen4b-part004",
+      "archive": "runtime-qwen4b-part004.zip",
+      "required": false,
+      "extract_to": ".",
+      "group": "qwen4b",
+      "size_bytes": 344516541,
+      "sha256": "4f162c688c9a185a9cdf6b77db9dffdc89e063713cbdac33253aefa910447215",
+      "expanded_size_bytes": 349220128,
+      "file_count": 1
+    },
+    {
+      "id": "qwen4b-part005",
+      "archive": "runtime-qwen4b-part005.zip",
+      "required": false,
+      "extract_to": ".",
+      "group": "qwen4b",
+      "size_bytes": 590,
+      "sha256": "d3065c8e332038307820e71c5021acfd72cf4ee2f6e76a4d157e6432a17f6c71",
+      "expanded_size_bytes": 531,
+      "file_count": 1
+    }
+  ],
+  "native_acceptance": "not_tested",
+  "notes": [
+    "Native functionality requires separate installation validation.",
+    "OCR WSL, host drivers, Linux distributions and personal accounts are not included."
+  ]
+}

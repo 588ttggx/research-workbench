@@ -1,0 +1,6 @@
+# Dedicated Linux/WSL document recognition service; not the chat provider.
+# Install with uv --torch-backend=cu129 and the sibling frozen requirements.
+--extra-index-url https://download.pytorch.org/whl/cu129
+vllm==0.32.0
+torch==2.13.0+cu129
+ninja==1.13.2
