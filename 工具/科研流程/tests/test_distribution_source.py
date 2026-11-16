@@ -168,7 +168,7 @@ class DistributionSourceTests(unittest.TestCase):
             '工具/科研流程/dataset_store.py': "env.setdefault('DVC_SITE_CACHE_DIR','" + drive + "')\n",
             '工具/科研流程/document_parser.py': "cache = Path(config.get('cache', '" + drive + "'))\n",
             '工具/科研流程/professional_tools.py': "temporary = Path('" + drive + "')\n",
-            '工具/科研流程/rspace_runtime.py': "allowed=Path('" + drive + "').resolve()\n",
+            '工具/科研流程/rspace_runtime.py': "allowed=Path('" + drive + "').absolute()\n",
             '工具/科研流程/scientific_figures.py': "os.environ.setdefault('MPLCONFIGDIR','" + drive + "')\n",
             '.agents/skills/scholarly-paper-collector/scripts/scholarly_collector/config.py':
                 'def default_cache(run_dir: Path) -> Path:\n'

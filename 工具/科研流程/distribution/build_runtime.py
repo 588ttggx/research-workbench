@@ -91,8 +91,8 @@ def _file(source, destination):
     return Entry(source, _relative(str(destination)).as_posix(), _stamp(source))
 
 
-def _venv_config(app, expected):
-    config = _real_path(app / '.venv/pyvenv.cfg')
+def _venv_config(environment, expected):
+    config = _real_path(environment / 'pyvenv.cfg')
     values = {}
     for line in config.read_text('utf-8-sig').splitlines():
         if '=' in line:
@@ -109,6 +109,23 @@ def _venv_config(app, expected):
     if not (home/'python.exe').is_file() or not (home/'LICENSE.txt').is_file():
         raise ValueError('Python base interpreter or license is missing.')
     return home, version
+
+
+def _check_workflow_ocr(app, site_packages):
+    project = _real_path(app/'pyproject.toml')
+    if not project.is_file():
+        return
+    dependencies = tomllib.loads(project.read_text('utf-8')).get('project', {}).get('dependencies', [])
+    pinned = next((item for item in dependencies if item.startswith('rapidocr==')), '')
+    if not pinned:
+        return
+    version = pinned.split('==', 1)[1]
+    metadata = _real_path(site_packages/f'rapidocr-{version}.dist-info/METADATA')
+    legacy = ((site_packages/'rapidocr_onnxruntime').exists()
+              or any(site_packages.glob('rapidocr_onnxruntime-*.dist-info')))
+    if not metadata.is_file() or legacy:
+        raise ValueError('OCR environment must match '+pinned+' without legacy RapidOCR. '
+                         'Rebuild it from uv.lock and pass --workflow-env to select it.')
 
 
 def _notebook(root):
@@ -144,10 +161,15 @@ def _plans(root, components, overrides, versions):
         if component in ('python313', 'python312'):
             app, target, expected = ((root/WORKFLOW, WORKFLOW, '3.13') if component=='python313'
                                      else (notebook, notebook_target, '3.12'))
-            base, version = _venv_config(app, expected)
+            override = overrides.get('workflow_env') if component=='python313' else None
+            environment = _real_path(override or app/'.venv')
+            base, version = _venv_config(environment, expected)
+            site_packages = _real_path(environment/'Lib/site-packages')
+            if component=='python313':
+                _check_workflow_ocr(app, site_packages)
             excluded = tuple(PurePosixPath(p) for p in ('Lib/site-packages', 'Scripts', 'Doc', 'share'))
             entries = _tree(base, 'runtime/'+component, excluded=excluded)
-            entries += _tree(app/'.venv/Lib/site-packages', target/'.venv/Lib/site-packages')
+            entries += _tree(site_packages, target/'.venv/Lib/site-packages')
             packages.append({'name': 'CPython', 'version': version, 'license': 'PSF-2.0',
                              'source': 'https://www.python.org/'})
         elif component == 'open-notebook':
@@ -341,7 +363,7 @@ def build_runtime(root, output, components=CORE_COMPONENTS, *, source_overrides=
                   replace_existing=False):
     """Return installer manifest items; the release owner supplies their URLs.
 
-    Source overrides select already-reviewed executable/license files. No network
+    Source overrides select reviewed runtimes and license files. No network
     access, package execution, environment mutation or live database read occurs.
     """
     root, output = _real_path(root), _real_path(output)
@@ -353,7 +375,7 @@ def build_runtime(root, output, components=CORE_COMPONENTS, *, source_overrides=
     if not 0 < max_archive_bytes <= MAX_ARCHIVE_BYTES:
         raise ValueError('Invalid runtime archive limit.')
     overrides = source_overrides or {}
-    if set(overrides)-{'node', 'surreal', 'node_license', 'surreal_license', 'notebook_frontend'}:
+    if set(overrides)-{'node', 'surreal', 'node_license', 'surreal_license', 'notebook_frontend', 'workflow_env'}:
         raise ValueError('Unknown runtime source override.')
     report_path = output/'runtime_inventory.json'
     previous = {'packages': [], 'components': []}
@@ -423,8 +445,11 @@ if __name__ == '__main__':
     parser.add_argument('--components', nargs='+', default=CORE_COMPONENTS, choices=CORE_COMPONENTS)
     parser.add_argument('--node-license', type=Path)
     parser.add_argument('--surreal-license', type=Path)
+    parser.add_argument('--workflow-env', type=Path,
+                        help='Python 3.13 virtual environment rebuilt from the workflow lockfile')
     args = parser.parse_args()
-    overrides = {key: value for key, value in {'node_license': args.node_license, 'surreal_license': args.surreal_license}.items() if value}
+    overrides = {key: value for key, value in {'node_license': args.node_license,
+                 'surreal_license': args.surreal_license, 'workflow_env': args.workflow_env}.items() if value}
     result = build_runtime(args.root, args.output, args.components, source_overrides=overrides,
                            progress=lambda value: print(json.dumps(value), flush=True))
     print(json.dumps(result, ensure_ascii=False, indent=2))

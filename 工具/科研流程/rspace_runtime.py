@@ -1,5 +1,7 @@
 """Lifecycle of the explicitly provisioned local RSpace, not arbitrary hosts."""
 import json
+import os
+import stat
 import subprocess
 import time
 from pathlib import Path
@@ -14,6 +16,34 @@ def deployment():
     return {key:value.get(key) for key in ('installed','version','url','runtime','war_sha256','scientific_acceptance')}
 
 
+def is_reparse_point(path):
+    info = path.lstat()
+    return stat.S_ISLNK(info.st_mode) or bool(getattr(info, 'st_file_attributes', 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT)
+
+
+def runtime_path(registered):
+    error = '已登记 RSpace 配置位置不符，未启动其他程序。'
+    if not isinstance(registered, str) or not registered:
+        raise ValueError(error)
+    if registered == 'runtime/RSpace':
+        runtime = w.ROOT / registered
+    else:
+        candidate = Path(registered)
+        if not candidate.is_absolute():
+            raise ValueError(error)
+        runtime = Path(os.path.abspath(candidate))
+        allowed=(w.ROOT/'runtime/RSpace').absolute()
+        if not runtime.is_relative_to(allowed):
+            raise ValueError(error)
+    compose = runtime / 'compose.yaml'
+    if len(runtime.drive) != 2 or not compose.is_file():
+        raise ValueError(error)
+    for path in (compose, *compose.parents):
+        if is_reparse_point(path):
+            raise ValueError(error)
+    return runtime
+
+
 def account():
     path=w.DATA/'rspace-bootstrap.dpapi'
     if not deployment().get('installed') or not path.is_file():raise ValueError('本机实例尚未建立日常账号')
@@ -25,6 +55,7 @@ def account():
 def start():
     value=deployment()
     if not value.get('installed'):return {'status':'not_deployed'}
+    runtime = runtime_path(value['runtime'])
     with FileLock(str(w.DATA/'rspace-runtime.lock'),timeout=30):
         import professional_tools as p
         old=w.read_json(w.DATA/'rspace-process.json',{})
@@ -42,9 +73,6 @@ def start():
                 process=subprocess.Popen(['wsl.exe','-d','Ubuntu-24.04','--exec','sleep','2147483647'],stdin=subprocess.DEVNULL,stdout=log,stderr=log,
                                          creationflags=subprocess.CREATE_NO_WINDOW|subprocess.DETACHED_PROCESS)
             w.write_json(w.DATA/'rspace-process.json',{'pid':process.pid,'stamp':p._process_stamp(process.pid),'started':w.now()})
-        runtime=Path(value['runtime']).resolve()
-        allowed=(w.ROOT/'runtime/RSpace').resolve()
-        if not runtime.is_relative_to(allowed) or not (runtime/'compose.yaml').is_file():raise ValueError('已登记 RSpace 配置位置不符，未启动其他程序')
         linux='/mnt/'+runtime.drive[0].lower()+'/'+runtime.relative_to(runtime.anchor).as_posix()
         ready=False
         for attempt in range(15):

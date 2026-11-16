@@ -424,6 +424,26 @@ if ($Action -eq 'start-document-parser') {
     }
     exit 0
 }
+function Resolve-RSpaceRuntime([string]$Registered, [string]$WorkspaceRoot) {
+    $invalid = 'Registered RSpace runtime is outside the provisioned location or has no compose file.'
+    if ($Registered -ceq 'runtime/RSpace') {
+        $runtime = [IO.Path]::GetFullPath((Join-Path $WorkspaceRoot 'runtime/RSpace'))
+    } else {
+        if ($Registered -notmatch '^[A-Za-z]:[\\/]') { throw $invalid }
+        $runtime = [IO.Path]::GetFullPath($Registered)
+        $allowed = [IO.Path]::GetFullPath((Join-Path $workspaceRoot 'runtime/RSpace'))
+        if ($runtime -ne $allowed -and -not $runtime.StartsWith($allowed+'\',[StringComparison]::OrdinalIgnoreCase)) { throw $invalid }
+    }
+    $compose = Join-Path $runtime 'compose.yaml'
+    if ($runtime -notmatch '^[A-Za-z]:[\\/]' -or -not (Test-Path -LiteralPath $compose -PathType Leaf)) { throw $invalid }
+    for ($candidate = $compose; $candidate; $candidate = $parent.FullName) {
+        if ((Get-Item -LiteralPath $candidate -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) { throw $invalid }
+        $parent = [IO.Directory]::GetParent($candidate)
+        if ($null -eq $parent) { break }
+    }
+    return $runtime
+}
+
 function Start-OwnedRSpace {
     $workspaceRoot = Split-Path (Split-Path $serviceRoot -Parent) -Parent
     $dataRoot = Join-Path $workspaceRoot '工具\科研流程\数据'
@@ -431,11 +451,7 @@ function Start-OwnedRSpace {
     if (-not (Test-Path -LiteralPath $deploymentPath)) { return }
     $deployment = Get-Content -LiteralPath $deploymentPath -Raw -Encoding UTF8 | ConvertFrom-Json
     if (-not $deployment.installed) { return }
-    $runtime = [IO.Path]::GetFullPath([string]$deployment.runtime)
-    $allowed = [IO.Path]::GetFullPath((Join-Path $workspaceRoot 'runtime/RSpace'))
-    if (($runtime -ne $allowed -and -not $runtime.StartsWith($allowed+'\',[StringComparison]::OrdinalIgnoreCase)) -or -not (Test-Path -LiteralPath (Join-Path $runtime 'compose.yaml'))) {
-        throw 'Registered RSpace runtime is outside the provisioned location.'
-    }
+    $runtime = Resolve-RSpaceRuntime ([string]$deployment.runtime) $workspaceRoot
     $wsl = Join-Path $env:SystemRoot 'System32\wsl.exe'
     $helper = Get-OwnedProcess 'rspace-helper'
     if (-not $helper) {

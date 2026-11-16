@@ -136,6 +136,24 @@ class RuntimeArchives(unittest.TestCase):
         with patch.object(Path, 'open', guarded):
             self.build(('open-notebook',))
 
+    def test_python313_rejects_stale_ocr_and_accepts_verified_environment(self):
+        self.put(self.workflow/'pyproject.toml', '[project]\ndependencies = ["rapidocr==3.9.2"]\n')
+        legacy = self.workflow/'.venv/Lib/site-packages/rapidocr_onnxruntime-1.4.4.dist-info/METADATA'
+        self.put(legacy, 'Name: rapidocr-onnxruntime\nVersion: 1.4.4\n')
+        with self.assertRaisesRegex(ValueError, 'OCR environment.*rapidocr==3.9.2'):
+            self.build(('python313',))
+
+        environment = Path(self.tmp.name)/'verified-venv'
+        self.put(environment/'pyvenv.cfg', (self.workflow/'.venv/pyvenv.cfg').read_bytes())
+        metadata = 'rapidocr-3.9.2.dist-info/METADATA'
+        self.put(environment/'Lib/site-packages'/metadata,
+                 'Name: rapidocr\nVersion: 3.9.2\nLicense-Expression: Apache-2.0\n')
+        self.overrides['workflow_env'] = environment
+        with self.archive(self.build(('python313',))[0]) as archive:
+            names = archive.namelist()
+            self.assertIn('工具/科研流程/.venv/Lib/site-packages/'+metadata, names)
+            self.assertFalse(any('rapidocr_onnxruntime' in name for name in names))
+
     def test_inventory_prefers_official_source_repository_for_license_review(self):
         metadata = self.workflow/'.venv/Lib/site-packages/dependency-1.0.dist-info/METADATA'
         self.put(metadata, 'Name: dependency\nVersion: 1.0\nLicense: AGPL-3.0\n'

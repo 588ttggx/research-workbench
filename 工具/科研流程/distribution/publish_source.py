@@ -27,6 +27,7 @@ SKILLS = {'idea-evaluator', 'tech-paper-template', 'figure-designer',
 TOP_FILES = {'pyproject.toml', 'uv.lock', 'requirements.txt',
              'document-parser-requirements.in', 'document-parser-requirements.lock',
              'document-vllm-requirements.in', 'document-vllm-requirements.lock'}
+PUBLIC_REGRESSION_TESTS = {'test_fulltext_quality.py', 'test_portable_backup.py'}
 LOCAL_MAINTENANCE = {'verify_locked_environment.py', 'provision_science_tools.py'}
 TOP_SUFFIXES = {'.py', '.js', '.css', '.html'}
 TEXT_SUFFIXES = {'.py', '.js', '.mjs', '.cjs', '.jsx', '.ts', '.tsx', '.css',
@@ -119,7 +120,8 @@ def _allowed(relative: PurePosixPath) -> bool:
         if category == 'distribution':
             return relative.suffix.lower() in {'.py', '.ps1', '.cmd', '.iss', '.json', '.toml', '.md', '.txt'}
         if category == 'tests':
-            return len(tail) == 2 and tail[1].startswith('test_distribution_') and relative.suffix == '.py'
+            return len(tail) == 2 and (tail[1] in PUBLIC_REGRESSION_TESTS or
+                                      tail[1].startswith('test_distribution_') and relative.suffix == '.py')
     if len(parts) == 4 and parts[:3] == ('.agents', 'rules', 'research'):
         return relative.stem in RULES and relative.suffix == '.md'
     if len(parts) >= 4 and parts[:2] == ('.agents', 'skills') and parts[2] in SKILLS:
@@ -199,8 +201,8 @@ def default_replacements(root: Path) -> dict[str, dict[str, str]]:
          r"temporary = Path\('[^'\r\n]+'\)",
          "temporary = w.ROOT/'runtime/cache/Cytoscape/tmp'"),
         ('工具/科研流程/rspace_runtime.py',
-         r"allowed=Path\('[^'\r\n]+'\)\.resolve\(\)",
-         "allowed=(w.ROOT/'runtime/RSpace').resolve()"),
+         r"allowed=Path\('[^'\r\n]+'\)\.absolute\(\)",
+         "allowed=(w.ROOT/'runtime/RSpace').absolute()"),
         ('工具/科研流程/scientific_figures.py',
          r"os\.environ\.setdefault\('MPLCONFIGDIR','[^'\r\n]+'\)",
          "os.environ.setdefault('MPLCONFIGDIR',str(w.ROOT/'runtime/cache/Matplotlib'))"),

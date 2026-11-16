@@ -23,7 +23,7 @@ dependencies = [
   "pymupdf==1.28.2",
   "pywin32==312",
   "pywinauto==0.6.9",
-  "rapidocr-onnxruntime==1.4.4",
+  "rapidocr==3.9.2",
   "requests==2.34.2",
   "shapely==2.2.0",
   "six==1.17.0",

@@ -9,6 +9,7 @@ import threading
 
 VERSION = 'fulltext-parser-v3'
 _OCR = None
+_OCR_LOCK = threading.Lock()
 _CACHE_LOCK = threading.RLock()
 
 
@@ -91,14 +92,19 @@ def ocr_page(page):
     global _OCR
     import pymupdf
     import numpy as np
-    from rapidocr_onnxruntime import RapidOCR
-    if _OCR is None: _OCR = RapidOCR(intra_op_num_threads=4, inter_op_num_threads=2)
+    from rapidocr import RapidOCR
+
     pixmap = page.get_pixmap(matrix=pymupdf.Matrix(2, 2), alpha=False)
     image = np.frombuffer(pixmap.samples, dtype=np.uint8).reshape(
         pixmap.height, pixmap.width, pixmap.n)[:, :, ::-1].copy()
-    lines, _ = _OCR(image); lines = lines or []
-    return ('\n'.join(line[1] for line in lines),
-            round(sum(float(line[2]) for line in lines)/len(lines), 3) if lines else 0)
+    with _OCR_LOCK:
+        if _OCR is None:
+            _OCR = RapidOCR(params={'EngineConfig.onnxruntime.intra_op_num_threads': 4,
+                                    'EngineConfig.onnxruntime.inter_op_num_threads': 2})
+        result = _OCR(image)
+    if not result.txts:
+        return '', 0
+    return '\n'.join(result.txts), round(sum(float(score) for score in result.scores)/len(result.txts), 3)
 
 
 def extract(artifact, legacy_path, sha, *, repair=False):

@@ -524,7 +524,10 @@ def rehearse(path):
 
 if __name__=='__main__':
     import sys
-    if len(sys.argv)>1 and sys.argv[1]=='rehearse':
+    if len(sys.argv)>1 and sys.argv[1] in ('portable-export','portable-restore'):
+        from portable_backup import cli
+        result=cli(sys.argv[1:])
+    elif len(sys.argv)>1 and sys.argv[1]=='rehearse':
         selected=Path(sys.argv[2]) if len(sys.argv)>2 else w.ROOT/w.read_json(w.DATA/'最近备份.json')['file']
         result=rehearse(selected)
     elif len(sys.argv)>2 and sys.argv[1]=='verify':result=verify(sys.argv[2])

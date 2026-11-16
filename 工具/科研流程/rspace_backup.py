@@ -14,9 +14,10 @@ import workflow as w
 
 
 def export(folder):
-    from rspace_runtime import deployment
+    from rspace_runtime import deployment, is_reparse_point, runtime_path
     deployed=deployment()
     if not deployed.get('installed'):return {'status':'not_deployed'}
+    runtime=runtime_path(deployed['runtime'])
     folder=Path(folder);sql=folder/'rspace.sql';media=folder/'rspace-media.tar'
     prefix=['wsl.exe','-d','Ubuntu-24.04','-u','root','--exec','docker','exec']
     tasks=[(sql,['yanxu-rspace-db','sh','-c','exec mariadb-dump --single-transaction --routines --triggers --hex-blob -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" "$MARIADB_DATABASE"']),
@@ -39,10 +40,17 @@ def export(folder):
             with target.open('wb') as output:
                 result=subprocess.run(prefix+args,stdout=output,stderr=subprocess.PIPE,timeout=180,creationflags=subprocess.CREATE_NO_WINDOW)
             if result.returncode or not target.stat().st_size:raise ValueError('RSpace 原生备份未完成，请使用统一备份入口；实例和旧备份保留')
-    runtime=Path(deployed['runtime']);config=folder/'rspace-runtime.zip'
+    config=folder/'rspace-runtime.zip'
     with zipfile.ZipFile(config,'w',zipfile.ZIP_DEFLATED) as archive:
-        for path in runtime.rglob('*'):
-            if path.is_file() and path.suffix not in ('.war','.download'):archive.write(path,path.relative_to(runtime).as_posix())
+        directories = [runtime]
+        while directories:
+            for path in directories.pop().iterdir():
+                if is_reparse_point(path):
+                    raise ValueError('RSpace 运行目录含链接，无法验证备份范围。')
+                if path.is_dir():
+                    directories.append(path)
+                elif path.is_file() and path.suffix not in ('.war', '.download'):
+                    archive.write(path, path.relative_to(runtime).as_posix())
     receipt={'status':'exported','version':deployed['version'],'created':w.now(),
              'files':{p.name:{'bytes':p.stat().st_size,'sha256':__import__('backup_crypto').file_digest(p)} for p in [sql,media,config]},
              'scope':'MariaDB 单事务原生导出及其后收集的媒体文件。备份期间不能运行永久清空回收站/物理清理；正常新增媒体不会被纳入更早的数据库版本。独立实例恢复另行验收。'}
