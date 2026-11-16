@@ -3,6 +3,8 @@ from pathlib import Path
 import hashlib
 import json
 import os
+import shutil
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -48,7 +50,7 @@ class RuntimeArchives(unittest.TestCase):
         self.put(self.notebook/'pyproject.toml', '[project]\nname="open-notebook"\nversion="1.15.0"\n')
         self.put(self.notebook/'.env', 'DO_NOT_READ=private')
         self.put(self.notebook/'data/private.sqlite', b'private database')
-        self.put(self.notebook/'frontend/.next/standalone/server.js', 'standalone fixture')
+        self.frontend(self.notebook/'frontend')
         self.put(self.notebook/'frontend/.next/standalone/node_modules/next/LICENSE', 'next license')
         self.put(self.notebook/'frontend/.next/static/chunk.js', 'static fixture')
         self.put(self.notebook/'frontend/public/icon.svg', '<svg/>')
@@ -67,6 +69,24 @@ class RuntimeArchives(unittest.TestCase):
     def put(path, content):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content if isinstance(content, bytes) else content.encode('utf-8'))
+
+    def frontend(self, folder, build_root=None):
+        build_root = build_root or str(folder)
+        config = {'output': 'standalone', 'outputFileTracingRoot': build_root,
+                  'repoRoot': build_root, 'turbopack': {'root': build_root},
+                  'experimental': {'turbo': {'root': build_root}},
+                  '_originalRewrites': {'afterFiles': [{'source': '/api/:path*',
+                    'destination': 'http://127.0.0.1:5055/api/:path*'}]},
+                  'htmlLimitedBots': r'[\w-]+-Google'}
+        self.put(folder/'.next/standalone/server.js',
+                 "const path = require('path')\nconst dir = path.join(__dirname)\n"
+                 "process.chdir(__dirname)\nconst nextConfig = " + json.dumps(config) + "\n"
+                 "process.env.__NEXT_PRIVATE_STANDALONE_CONFIG = JSON.stringify(nextConfig)\n"
+                 "module.exports = {dir, nextConfig}\n")
+        self.put(folder/'.next/standalone/.next/required-server-files.json',
+                 json.dumps({'version': 1, 'config': config, 'appDir': build_root,
+                             'relativeAppDir': '', 'files': ['.next/routes-manifest.json']}))
+        return config
 
     def build(self, components=runtime.CORE_COMPONENTS, **kwargs):
         return runtime.build_runtime(self.root, self.output, components,
@@ -201,13 +221,15 @@ class RuntimeArchives(unittest.TestCase):
         first = self.build(('python313', 'open-notebook'))
         original_python = (self.output/first[0]['archive']).read_bytes()
         prepared = self.root/'output/prepared-frontend'
-        self.put(prepared/'.next/standalone/server.js', 'security-fixed frontend')
+        self.frontend(prepared)
+        with (prepared/'.next/standalone/server.js').open('a', encoding='utf-8') as stream:
+            stream.write('// security-fixed frontend\n')
         self.put(prepared/'.next/static/new.js', 'new static')
         self.put(prepared/'public/icon.svg', '<svg>new</svg>')
         self.overrides['notebook_frontend'] = prepared
         changed = self.build(('open-notebook',), replace_existing=True)
         with self.archive(changed[0]) as archive:
-            self.assertEqual(archive.read('工具/OpenNotebook/open-notebook-1.15.0/frontend/server.js'), b'security-fixed frontend')
+            self.assertIn(b'// security-fixed frontend', archive.read('工具/OpenNotebook/open-notebook-1.15.0/frontend/server.js'))
         self.assertEqual((self.output/first[0]['archive']).read_bytes(), original_python)
         report = json.loads((self.output/'runtime_inventory.json').read_text('utf-8'))
         self.assertEqual({x['id'] for x in report['components']}, {'python313', 'open-notebook'})
@@ -221,6 +243,64 @@ class RuntimeArchives(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.build(('node',), replace_existing=True)
         self.assertEqual(archive.read_bytes(), b'user changed archive')
+
+    def test_frontend_privacy_transform_preserves_routes_and_relocates_runtime_config(self):
+        frontend = self.notebook/'frontend'
+        target = '工具/OpenNotebook/open-notebook-1.15.0/frontend/'
+        for separator in ('/', '\\'):
+            with self.subTest(separator=separator):
+                private_root = ('Z:' + '/private-build/account/notebook').replace('/', separator)
+                original_config = self.frontend(frontend, private_root)
+                source = frontend/'.next/standalone/server.js'
+                original = source.read_bytes()
+                items = self.build(('open-notebook',), replace_existing=True)
+                with self.archive(items[0]) as archive:
+                    server = archive.read(target+'server.js').decode('utf-8')
+                    required = json.loads(archive.read(target+'.next/required-server-files.json'))
+                    self.assertEqual(items[0]['expanded_size_bytes'], sum(x.file_size for x in archive.infolist()))
+                self.assertNotIn('private-build', server)
+                self.assertNotIn('private-build', json.dumps(required))
+                self.assertEqual(required['appDir'], '.')
+                self.assertEqual(required['config']['outputFileTracingRoot'], '.')
+                self.assertEqual(required['config']['repoRoot'], '.')
+                self.assertEqual(required['config']['turbopack']['root'], '.')
+                self.assertEqual(required['config']['experimental']['turbo']['root'], '.')
+                self.assertEqual(required['config']['_originalRewrites'], original_config['_originalRewrites'])
+                self.assertEqual(required['config']['htmlLimitedBots'], original_config['htmlLimitedBots'])
+                self.assertEqual(source.read_bytes(), original)
+                # Execute only this synthetic server: it cannot start services or use live state.
+                node = shutil.which('node.exe') or shutil.which('node')
+                if node:
+                    relocated = self.root/'output/relocated frontend/server.cjs'
+                    self.put(relocated, server)
+                    result = subprocess.run([node, '-e',
+                        "let x=require(process.argv[1]);console.log(JSON.stringify({dir:x.dir,"
+                        "config:x.nextConfig,env:JSON.parse(process.env.__NEXT_PRIVATE_STANDALONE_CONFIG)}))",
+                        str(relocated)], cwd=self.root, capture_output=True, text=True, timeout=15, check=True)
+                    actual = json.loads(result.stdout)
+                    self.assertEqual(actual['config'], actual['env'])
+                    for value in (actual['dir'], actual['config']['outputFileTracingRoot'],
+                                  actual['config']['repoRoot'], actual['config']['turbopack']['root'],
+                                  actual['config']['experimental']['turbo']['root']):
+                        self.assertEqual(Path(value).resolve(), relocated.parent.resolve())
+                    self.assertEqual(actual['config']['_originalRewrites'], original_config['_originalRewrites'])
+
+    def test_unknown_frontend_template_or_remaining_build_root_fails_closed(self):
+        frontend = self.notebook/'frontend'
+        source = frontend/'.next/standalone/server.js'
+        self.put(source, 'const renamedConfig = {}\n')
+        with self.assertRaisesRegex(ValueError, 'standalone|template'):
+            self.build(('open-notebook',))
+        self.assertEqual(list(self.output.glob('*.zip')), [])
+        build_root = 'Z:' + '/private-build/account/notebook'
+        self.frontend(frontend, build_root)
+        required = frontend/'.next/standalone/.next/required-server-files.json'
+        value = json.loads(required.read_text('utf-8'))
+        value['unexpectedNewBuildPath'] = build_root + '/private-source'
+        self.put(required, json.dumps(value))
+        with self.assertRaisesRegex(ValueError, 'build root'):
+            self.build(('open-notebook',))
+        self.assertEqual(list(self.output.glob('*.zip')), [])
 
 
 if __name__ == '__main__':

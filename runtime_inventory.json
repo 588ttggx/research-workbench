@@ -1891,11 +1891,11 @@
     {
       "id": "open-notebook",
       "archive": "runtime-open-notebook.zip",
-      "sha256": "8c60e3d01eee25351163733357b843cada459c51e677eb8979c39afcb1377599",
-      "size_bytes": 14470070,
+      "sha256": "161c08e284a8d339924f0b96644c84f01570fe4e1883517da4c9e5426c5213ce",
+      "size_bytes": 14469797,
       "required": true,
       "extract_to": ".",
-      "expanded_size_bytes": 41282299,
+      "expanded_size_bytes": 41281663,
       "file_count": 2065
     },
     {

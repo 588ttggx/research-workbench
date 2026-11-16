@@ -6,12 +6,12 @@ entrypoint generation happen at installation time, never in the source tree.
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from email.parser import Parser
 import hashlib
 import json
 import os
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 import re
 import shutil
 import stat
@@ -37,6 +37,7 @@ class Entry:
     source: Path
     destination: str
     fingerprint: tuple
+    transform: str = ''
 
 
 def _stamp(path):
@@ -164,8 +165,13 @@ def _plans(root, components, overrides, versions):
             frontend = _real_path(overrides.get('notebook_frontend') or notebook/'frontend')
             if not _real_path(frontend/'.next/standalone/server.js').is_file():
                 raise FileNotFoundError('Open Notebook standalone server.js is missing.')
-            entries += _tree(frontend/'.next/standalone', notebook_target/'frontend',
-                             excluded=(PurePosixPath('.next/static'), PurePosixPath('public')))
+            standalone = _tree(frontend/'.next/standalone', notebook_target/'frontend',
+                               excluded=(PurePosixPath('.next/static'), PurePosixPath('public')))
+            transforms = {str(notebook_target/'frontend/server.js'): 'next-server',
+                          str(notebook_target/'frontend/.next/required-server-files.json'): 'next-required'}
+            if not set(transforms).issubset({entry.destination for entry in standalone}):
+                raise FileNotFoundError('Open Notebook standalone build metadata is missing.')
+            entries += [replace(entry, transform=transforms.get(entry.destination, '')) for entry in standalone]
             entries += _tree(frontend/'.next/static', notebook_target/'frontend/.next/static')
             entries += _tree(frontend/'public', notebook_target/'frontend/public')
             version = tomllib.loads((notebook/'pyproject.toml').read_text('utf-8')).get('project', {}).get('version', 'unknown')
@@ -243,6 +249,69 @@ def _digest(path):
     return value.hexdigest()
 
 
+def _relocate_next_config(config):
+    """Only build-root fields change; route URLs and all other settings survive."""
+    if not isinstance(config, dict) or config.get('output') != 'standalone':
+        raise ValueError('Unsupported Next standalone configuration template.')
+    roots, fields = [], []
+    for keys in (('outputFileTracingRoot',), ('repoRoot',), ('turbopack', 'root'),
+                 ('experimental', 'turbo', 'root')):
+        owner = config
+        for key in keys[:-1]:
+            owner = owner.get(key, {})
+            if not isinstance(owner, dict):
+                raise ValueError('Unsupported Next standalone root configuration.')
+        if keys[-1] in owner:
+            value = owner[keys[-1]]
+            if not isinstance(value, str) or not (value == '.' or Path(value).is_absolute() or PureWindowsPath(value).is_absolute()):
+                raise ValueError('Unsupported Next standalone build root.')
+            if value != '.':
+                roots.append(value)
+            owner[keys[-1]] = '.'
+            fields.append('.'.join(keys))
+    return roots, fields
+
+
+def _reject_build_roots(text, roots):
+    for root in roots:
+        for form in {root, root.replace('\\', '/'), root.replace('/', '\\')}:
+            candidates = (form, json.dumps(form, ensure_ascii=False)[1:-1], json.dumps(form)[1:-1])
+            if any(value.casefold() in text.casefold() for value in candidates):
+                raise ValueError('Unrecognized Next standalone build root remains in release payload.')
+
+
+def _frontend_payload(entry):
+    text = entry.source.read_text('utf-8')
+    if entry.transform == 'next-required':
+        value = json.loads(text)
+        roots, _ = _relocate_next_config(value.get('config'))
+        app_dir = value.get('appDir')
+        if not isinstance(app_dir, str) or not (app_dir == '.' or Path(app_dir).is_absolute() or PureWindowsPath(app_dir).is_absolute()):
+            raise ValueError('Unsupported Next standalone appDir.')
+        if app_dir != '.':
+            roots.append(app_dir)
+        value['appDir'] = '.'
+        text = json.dumps(value, ensure_ascii=False, indent=2) + '\n'
+    elif entry.transform == 'next-server':
+        matches = list(re.finditer(r'^const nextConfig = ', text, re.MULTILINE))
+        if len(matches) != 1:
+            raise ValueError('Unsupported Next standalone server template.')
+        start = matches[0].end()
+        config, length = json.JSONDecoder().raw_decode(text[start:])
+        suffix = text[start+length:]
+        if not re.match(r';?\r?\n', suffix):
+            raise ValueError('Unsupported Next standalone config declaration.')
+        roots, fields = _relocate_next_config(config)
+        # Set roots before Next reads the serialized config, using the relocated
+        # server directory rather than the build host or the caller's cwd.
+        bindings = ''.join('\nnextConfig.' + field + ' = __dirname;' for field in fields)
+        text = text[:start] + json.dumps(config, ensure_ascii=False, separators=(',', ':')) + ';' + bindings + suffix.lstrip(';')
+    else:
+        raise ValueError('Unknown runtime payload transformation.')
+    _reject_build_roots(text, roots)
+    return text.encode('utf-8')
+
+
 def _zip(entries, path, limit):
     expanded = 0
     with zipfile.ZipFile(path, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=1, allowZip64=True) as archive:
@@ -250,10 +319,16 @@ def _zip(entries, path, limit):
             _real_path(entry.source)
             if _stamp(entry.source) != entry.fingerprint:
                 raise ValueError('Runtime source changed during build: '+entry.destination)
-            archive.write(entry.source, entry.destination)
+            if entry.transform:
+                payload = _frontend_payload(entry)
+                archive.writestr(zipfile.ZipInfo.from_file(entry.source, entry.destination), payload,
+                                 compress_type=zipfile.ZIP_DEFLATED, compresslevel=1)
+                expanded += len(payload)
+            else:
+                archive.write(entry.source, entry.destination)
+                expanded += entry.fingerprint[2]
             if _stamp(entry.source) != entry.fingerprint:
                 raise ValueError('Runtime source changed during build: '+entry.destination)
-            expanded += entry.fingerprint[2]
             if path.stat().st_size >= limit:
                 raise ValueError('Runtime archive exceeds the Release asset limit.')
     if path.stat().st_size >= limit:
